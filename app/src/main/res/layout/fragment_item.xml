@@ -6,7 +6,7 @@
             type="android.os.Parcelable"/>
         <variable
             name="handler"
-            type="app.hyuga.bleimage.handlers.ScanListHandler"/>
+            type="app.hyuga.bleimage.ui.scan.ScanlistHandler"/>
 
     </data>
     <LinearLayout

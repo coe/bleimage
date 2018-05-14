@@ -11,15 +11,14 @@ import android.view.ViewGroup
 import android.widget.TextView
 import app.hyuga.bleimage.R
 import app.hyuga.bleimage.databinding.FragmentItemBinding
+import app.hyuga.bleimage.ui.scan.ScanlistHandler
 
-
-import app.hyuga.bleimage.handlers.ScanListHandler
 
 import kotlinx.android.synthetic.main.fragment_item.view.*
 import kotlin.properties.Delegates
 
 class MyItemRecyclerViewAdapter(
-        private val mListener: ScanListHandler?)
+        private val mListener: ScanlistHandler?)
     : RecyclerView.Adapter<MyItemRecyclerViewAdapter.ViewHolder>() {
 
     var items: List<Parcelable> by Delegates.observable(emptyList()) { _, old, new ->

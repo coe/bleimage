@@ -6,6 +6,9 @@
         <variable
             name="handler"
             type="app.hyuga.bleimage.ui.main.MainHandler"/>
+        <variable
+            name="imageObservable"
+            type="app.hyuga.bleimage.ui.ImageObservable"/>
     </data>
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
@@ -43,6 +46,13 @@
                 android:layout_height="wrap_content"
                 android:onClick="@{() -> handler.onClickSend()}"
                 android:text="@string/send" />
+
+            <ImageView
+                android:id="@+id/imageView2"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:imageBitmap="@{imageObservable.imageBitmap}"
+                app:srcCompat="@mipmap/ic_launcher" />
         </LinearLayout>
     </android.support.constraint.ConstraintLayout>
 </layout>

@@ -14,8 +14,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import app.hyuga.bleimage.R
+import app.hyuga.bleimage.ui.scan.ScanlistHandler
 
-import app.hyuga.bleimage.handlers.ScanListHandler
 import app.hyuga.bleimage.viewmodels.ScanListViewModel
 
 /**
@@ -28,7 +28,7 @@ class ScanlistFragment : Fragment() {
     // TODO: Customize parameters
     private var columnCount = 1
 
-    private var listener: ScanListHandler? = null
+    private var listener: ScanlistHandler? = null
 
 //    private var dataList:ArrayList<Parcelable> = ArrayList()
 
@@ -75,7 +75,7 @@ class ScanlistFragment : Fragment() {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        if (context is ScanListHandler) {
+        if (context is ScanlistHandler) {
             listener = context
         } else {
             throw RuntimeException(context.toString() + " must implement ScanListHandler")
