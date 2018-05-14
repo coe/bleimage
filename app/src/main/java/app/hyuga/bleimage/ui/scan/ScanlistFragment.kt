@@ -33,7 +33,7 @@ class ScanlistFragment : Fragment(),ScanlistHandler {
         Log.d(TAG,"onCreate")
 
         super.onCreate(savedInstanceState)
-        val model = ViewModelProviders.of(this).get(ScanListViewModel::class.java)
+        val model = ViewModelProviders.of(this).get(ScanlistViewModel::class.java)
         model.getData().observe(this, Observer {
             it?.let {
                 Log.d("hyuu","データ受信")
