@@ -4,16 +4,26 @@ import android.content.Intent
 import android.os.Bundle
 import android.provider.MediaStore
 import android.support.v7.app.AppCompatActivity
-import android.view.Menu
-import android.view.MenuItem
+import app.hyuga.bleimage.ui.main.MainFragment
 import app.hyuga.bleimage.ui.main.MainHandler
 import app.hyuga.bleimage.ui.scan.ScanlistFragment
 import java.util.*
 
 class MainActivity : AppCompatActivity(),MainHandler {
+
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+        val fragment = MainFragment.newInstance()
+        supportFragmentManager.beginTransaction()
+                .replace(R.id.container,fragment)
+                .commit()
+    }
+
     override fun onClickScan() {
         //fragment変える
-        val fragment = ScanlistFragment.newInstance(1)
+        val fragment = ScanlistFragment.newInstance()
         supportFragmentManager.beginTransaction()
                 .replace(R.id.container,fragment)
                 .commit()
@@ -64,35 +74,6 @@ class MainActivity : AppCompatActivity(),MainHandler {
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
             startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE)
         }
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.main_menu,menu)
-        return true
-    }
-
-
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        when(item?.itemId) {
-            R.id.menu_camera -> {
-
-            }
-            R.id.menu_scan -> {
-
-            }
-            R.id.menu_send -> {
-
-
-
-
-            }
-        }
-        return super.onOptionsItemSelected(item)
     }
 
     companion object {
