@@ -1,33 +1,48 @@
 package app.hyuga.bleimage.ui.scan
 
+import android.arch.lifecycle.Observer
+import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.os.Bundle
+import android.os.Parcelable
 import android.support.v4.app.Fragment
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import app.hyuga.bleimage.R
-
-import app.hyuga.bleimage.ui.scan.dummy.DummyContent
-import app.hyuga.bleimage.ui.scan.dummy.DummyContent.DummyItem
 
 /**
  * A fragment representing a list of Items.
  * Activities containing this fragment MUST implement the
  * [ScanlistFragment.OnListFragmentInteractionListener] interface.
  */
-class ScanlistFragment : Fragment() {
+class ScanlistFragment : Fragment(),ScanlistHandler {
+    override fun onClickScanList(scanList: Parcelable) {
+    }
 
     // TODO: Customize parameters
     private var columnCount = 1
 
-    private var listener: OnListFragmentInteractionListener? = null
+    private lateinit var myItemRecyclerViewAdapter:MyItemRecyclerViewAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        Log.d(TAG,"onCreate")
+
         super.onCreate(savedInstanceState)
+        val model = ViewModelProviders.of(this).get(ScanListViewModel::class.java)
+        model.getData().observe(this, Observer {
+            it?.let {
+                Log.d("hyuu","データ受信")
+                val list:List<Parcelable> = it.map {
+                    it.value
+                }
+                myItemRecyclerViewAdapter.updateList(list)
+            }
+        })
 
         arguments?.let {
             columnCount = it.getInt(ARG_COLUMN_COUNT)
@@ -36,16 +51,19 @@ class ScanlistFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        val view = inflater.inflate(R.layout.fragment_item_list2, container, false)
+        Log.d(TAG,"onCreateView")
+        val view = inflater.inflate(R.layout.fragment_item_list, container, false)
 
         // Set the adapter
+        val self = this
         if (view is RecyclerView) {
             with(view) {
                 layoutManager = when {
                     columnCount <= 1 -> LinearLayoutManager(context)
                     else -> GridLayoutManager(context, columnCount)
                 }
-                adapter = MyItemRecyclerViewAdapter(DummyContent.ITEMS, listener)
+                myItemRecyclerViewAdapter = MyItemRecyclerViewAdapter(self)
+                adapter = myItemRecyclerViewAdapter
             }
         }
         return view
@@ -53,45 +71,24 @@ class ScanlistFragment : Fragment() {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        if (context is OnListFragmentInteractionListener) {
-            listener = context
-        } else {
-            throw RuntimeException(context.toString() + " must implement OnListFragmentInteractionListener")
-        }
     }
 
     override fun onDetach() {
         super.onDetach()
-        listener = null
-    }
-
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     *
-     *
-     * See the Android Training lesson
-     * [Communicating with Other Fragments](http://developer.android.com/training/basics/fragments/communicating.html)
-     * for more information.
-     */
-    interface OnListFragmentInteractionListener {
-        // TODO: Update argument type and name
-        fun onListFragmentInteraction(item: DummyItem?)
     }
 
     companion object {
 
         // TODO: Customize parameter argument names
         const val ARG_COLUMN_COUNT = "column-count"
+        const val TAG = "ScanlistFragment"
 
         // TODO: Customize parameter initialization
         @JvmStatic
-        fun newInstance(columnCount: Int) =
+        fun newInstance() =
                 ScanlistFragment().apply {
                     arguments = Bundle().apply {
-                        putInt(ARG_COLUMN_COUNT, columnCount)
+                        //                        putInt(ARG_COLUMN_COUNT, columnCount)
                     }
                 }
     }

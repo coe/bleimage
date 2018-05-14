@@ -24,7 +24,19 @@ private const val ARG_PARAM2 = "param2"
  * create an instance of this fragment.
  *
  */
-class MainFragment : Fragment() {
+class MainFragment : Fragment(),MainHandler {
+    override fun onClickScan() {
+
+    }
+
+    override fun onClickSend() {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun onClickCamera() {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null

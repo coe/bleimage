@@ -1,19 +1,70 @@
 package app.hyuga.bleimage
 
 import android.content.Intent
-import android.graphics.Bitmap
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.MediaStore
-import android.util.Log
+import android.support.v7.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
-import java.io.ByteArrayOutputStream
-import java.nio.ByteBuffer
-import java.nio.ByteOrder
+import app.hyuga.bleimage.ui.main.MainHandler
+import app.hyuga.bleimage.ui.scan.ScanlistFragment
 import java.util.*
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(),MainHandler {
+    override fun onClickScan() {
+        //fragment変える
+        val fragment = ScanlistFragment.newInstance(1)
+        supportFragmentManager.beginTransaction()
+                .replace(R.id.container,fragment)
+                .commit()
+    }
+
+    override fun onClickSend() {
+//        Log.d(TAG,"onClickSend:"+mainObservable.imageBitmap?.byteCount)
+//        val baoStream = ByteArrayOutputStream()
+//        mainObservable.imageBitmap?.compress(Bitmap.CompressFormat.JPEG, 90, baoStream)
+//        baoStream.flush()
+//        byteArray = baoStream.toByteArray()
+//        baoStream.close()
+//
+//
+//        byteArray?.let {
+//            mOffset = 0
+//            //mMtuずつ送る
+//            var maxsize = it.size
+//            var offset = 0
+//            val b = it.get(1)
+//            while (maxsize > mMtu) {
+//                val arr = it.sliceArray(offset..offset+mMtu-1)
+//                sendingBytesList.add(arr)
+//                offset += mMtu
+//                maxsize -= mMtu
+//            }
+//            val arr = it.sliceArray(offset..it.size-1)
+//            sendingBytesList.add(arr)
+//
+//        }
+//
+//
+//        //書き込む
+//        val lengthCharacteristic = mGatt!!.getService(LONG_DATA_SERVICE_UUID)!!.getCharacteristic(LONG_DATA_WRITE_LENGTH_CHARACTERISTIC_UUID)
+//        val length:Long = byteArray!!.size.toLong()
+//        Log.d(TAG,"length:"+length)
+//        val buffer = ByteBuffer.allocate(8).order(ByteOrder.LITTLE_ENDIAN).putLong(length)
+//        Log.d(TAG,"buffer:"+JavaUtil.tostr(buffer))
+//
+//        val ret = lengthCharacteristic.setValue(buffer.array())
+//
+//        Log.d(TAG,"descriptor ret:${ret}")
+//        mGatt?.writeCharacteristic(lengthCharacteristic)
+    }
+
+    override fun onClickCamera() {
+        val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE)
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,53 +80,13 @@ class MainActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         when(item?.itemId) {
             R.id.menu_camera -> {
-                val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-                if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-                    startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE)
-                }
+
             }
             R.id.menu_scan -> {
 
             }
             R.id.menu_send -> {
-//                Log.d(TAG,"onClickSend:"+mainObservable.imageBitmap?.byteCount)
-//                val baoStream = ByteArrayOutputStream()
-//                mainObservable.imageBitmap?.compress(Bitmap.CompressFormat.JPEG, 90, baoStream)
-//                baoStream.flush()
-//                byteArray = baoStream.toByteArray()
-//                baoStream.close()
-//
-//
-//                byteArray?.let {
-//                    mOffset = 0
-//                    //mMtuずつ送る
-//                    var maxsize = it.size
-//                    var offset = 0
-//                    val b = it.get(1)
-//                    while (maxsize > mMtu) {
-//                        val arr = it.sliceArray(offset..offset+mMtu-1)
-//                        sendingBytesList.add(arr)
-//                        offset += mMtu
-//                        maxsize -= mMtu
-//                    }
-//                    val arr = it.sliceArray(offset..it.size-1)
-//                    sendingBytesList.add(arr)
-//
-//                }
-//
-////                mGatt?.beginReliableWrite()
-//
-//                //書き込む
-//                val lengthCharacteristic = mGatt!!.getService(LONG_DATA_SERVICE_UUID)!!.getCharacteristic(LONG_DATA_WRITE_LENGTH_CHARACTERISTIC_UUID)
-//                val length:Long = byteArray!!.size.toLong()
-//                Log.d(TAG,"length:"+length)
-//                val buffer = ByteBuffer.allocate(8).order(ByteOrder.LITTLE_ENDIAN).putLong(length)
-//                Log.d(TAG,"buffer:"+JavaUtil.tostr(buffer))
-//
-//                val ret = lengthCharacteristic.setValue(buffer.array())
-//
-//                Log.d(TAG,"descriptor ret:${ret}")
-//                mGatt?.writeCharacteristic(lengthCharacteristic)
+
 
 
 
