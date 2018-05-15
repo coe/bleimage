@@ -9,6 +9,7 @@ import android.bluetooth.le.ScanResult
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.databinding.DataBindingUtil
 import android.graphics.Bitmap
 import android.net.Uri
 import android.support.v7.app.AppCompatActivity
@@ -22,6 +23,8 @@ import android.support.v7.app.AlertDialog
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import app.hyuga.bleimage.databinding.ActivityMainBinding
+import app.hyuga.bleimage.ui.ConnectedDeviceObservable
 import app.hyuga.bleimage.ui.main.MainFragment
 import app.hyuga.bleimage.ui.main.MainHandler
 import app.hyuga.bleimage.ui.receivedimage.ReceivedImageFragment
@@ -39,71 +42,14 @@ class MainActivity : AppCompatActivity(), MainFragment.OnListFragmentInteraction
     private var byteArray:ByteArray? = null
     private var mMtu = 32
     private var sendingBytesList:LinkedList<ByteArray> = LinkedList()
+    private var connectedDeviceObservable = ConnectedDeviceObservable()
     private var mGatt:BluetoothGatt? = null
-
-    override fun onClickScanList(scanList: Parcelable) {
-        Log.d(TAG,"onClickScanList")
-        supportFragmentManager.popBackStack()
-        val scanResult:ScanResult = scanList as ScanResult
-        scanResult.device.connectGatt(this,false,object : BluetoothGattCallback(){
-            override fun onCharacteristicWrite(gatt: BluetoothGatt?, characteristic: BluetoothGattCharacteristic?, status: Int) {
-                Log.d(TAG,"onCharacteristicWrite:")
-                super.onCharacteristicWrite(gatt, characteristic, status)
-
-                if (sendingBytesList.size == 0) {
-                    //512バイトまでしか送れないっぽい
-                    Log.d(TAG,"終了:")
-                } else  {
-                    val datas = sendingBytesList.poll()
-                    Log.d(TAG,"onCharacteristicWrite:"+datas.size)
-                    val lengthCharacteristic = gatt!!.getService(LONG_DATA_SERVICE_UUID)!!.getCharacteristic(LONG_DATA_WRITE_CHARACTERISTIC_UUID)
-
-                    lengthCharacteristic?.setValue(datas)
-                    gatt.writeCharacteristic(lengthCharacteristic!!)
-                }
-
-            }
-
-            override fun onServicesDiscovered(gatt: BluetoothGatt?, status: Int) {
-                Log.d(TAG,"onServicesDiscovered")
-                super.onServicesDiscovered(gatt, status)
-                mGatt = gatt
-            }
-
-            override fun onMtuChanged(gatt: BluetoothGatt?, mtu: Int, status: Int) {
-                Log.d(TAG,"onMtuChanged:"+mtu)
-                mMtu = mtu-5
-                gatt?.discoverServices()
-
-                super.onMtuChanged(gatt, mtu, status)
-            }
-
-            override fun onConnectionStateChange(gatt: BluetoothGatt?, status: Int, newState: Int) {
-                Log.d(TAG,"onConnectionStateChange:"+newState)
-                super.onConnectionStateChange(gatt, status, newState)
-                when (newState) {
-                    BluetoothProfile.STATE_CONNECTED -> {
-                        //onServicesDiscoveredに移行
-                        gatt?.requestMtu(MTU)
-
-
-                    }
-                    BluetoothProfile.STATE_DISCONNECTED -> {
-                    }
-                    BluetoothProfile.STATE_CONNECTING -> {
-                    }
-                    BluetoothProfile.STATE_DISCONNECTING -> {
-
-                    }
-                }
-            }
-        })
-
-    }
+    private lateinit var binding :ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = DataBindingUtil.setContentView(this,R.layout.activity_main)
+        binding.connectedDeviceObservable = connectedDeviceObservable
 
         supportFragmentManager.beginTransaction().replace(R.id.container,MainFragment.newInstance()).addToBackStack(null).commit()
 
@@ -137,6 +83,68 @@ class MainActivity : AppCompatActivity(), MainFragment.OnListFragmentInteraction
             })
         }
     }
+
+    override fun onClickScanList(scanList: Parcelable) {
+        Log.d(TAG,"onClickScanList")
+        supportFragmentManager.popBackStack()
+        val scanResult:ScanResult = scanList as ScanResult
+        scanResult.device.connectGatt(this,false,object : BluetoothGattCallback(){
+            override fun onCharacteristicWrite(gatt: BluetoothGatt?, characteristic: BluetoothGattCharacteristic?, status: Int) {
+                Log.d(TAG,"onCharacteristicWrite:")
+                super.onCharacteristicWrite(gatt, characteristic, status)
+
+                if (sendingBytesList.size == 0) {
+                    Log.d(TAG,"終了:")
+                } else  {
+                    val datas = sendingBytesList.poll()
+                    Log.d(TAG,"onCharacteristicWrite:"+datas.size)
+                    val lengthCharacteristic = gatt!!.getService(LONG_DATA_SERVICE_UUID)!!.getCharacteristic(LONG_DATA_WRITE_CHARACTERISTIC_UUID)
+
+                    lengthCharacteristic?.setValue(datas)
+                    gatt.writeCharacteristic(lengthCharacteristic!!)
+                }
+
+            }
+
+            override fun onServicesDiscovered(gatt: BluetoothGatt?, status: Int) {
+                Log.d(TAG,"onServicesDiscovered")
+                super.onServicesDiscovered(gatt, status)
+                mGatt = gatt
+            }
+
+            override fun onMtuChanged(gatt: BluetoothGatt?, mtu: Int, status: Int) {
+                Log.d(TAG,"onMtuChanged:"+mtu)
+                mMtu = mtu-5
+                gatt?.discoverServices()
+
+                super.onMtuChanged(gatt, mtu, status)
+            }
+
+            override fun onConnectionStateChange(gatt: BluetoothGatt?, status: Int, newState: Int) {
+                Log.d(TAG,"onConnectionStateChange:"+newState)
+                super.onConnectionStateChange(gatt, status, newState)
+                when (newState) {
+                    BluetoothProfile.STATE_CONNECTED -> {
+                        //onServicesDiscoveredに移行
+                        gatt?.requestMtu(MTU)
+                        //FIXME:nameが取れない
+                        connectedDeviceObservable.connectedDeviceName = gatt?.device?.name
+
+                    }
+                    BluetoothProfile.STATE_DISCONNECTED -> {
+                        connectedDeviceObservable.connectedDeviceName = null
+                    }
+                    BluetoothProfile.STATE_CONNECTING -> {
+                    }
+                    BluetoothProfile.STATE_DISCONNECTING -> {
+
+                    }
+                }
+            }
+        })
+
+    }
+
 
     override fun onStart() {
         super.onStart()
